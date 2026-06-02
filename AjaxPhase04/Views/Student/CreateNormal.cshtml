@@ -1,0 +1,21 @@
+﻿@model AjaxPhase04.Models.Student
+
+<h2>Create Student - Normal MVC Form</h2>
+
+<form asp-controller="Student" asp-action="CreateNormal" method="post">
+
+    <label>Name</label>
+    <input asp-for="Name" />
+    <br /><br />
+
+    <label>Email</label>
+    <input asp-for="Email" />
+    <br /><br />
+
+    <label>Department</label>
+    <input asp-for="Department" />
+    <br /><br />
+
+    <button type="submit">Save</button>
+
+</form>
