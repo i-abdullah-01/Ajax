@@ -1,0 +1,517 @@
+@model List<AjaxPhase04.Models.Student>
+
+@{
+    ViewData["Title"] = "Student2 Hub";
+}
+
+<!-- Premium Modern UI styling -->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    body {
+        background-color: #f3f4f6;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.12);
+    }
+
+    .gradient-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.4);
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-gradient:hover {
+        background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+        color: white;
+        transform: scale(1.02);
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+    }
+
+    .custom-table {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+
+    .custom-table tr {
+        background-color: white;
+        transition: all 0.2s ease;
+    }
+
+    .custom-table tr:hover {
+        background-color: #fafafa;
+        transform: scale(1.005);
+    }
+
+    .custom-table th {
+        border: none;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+        padding: 12px 16px;
+    }
+
+    .custom-table td {
+        border-top: 1px solid #f3f4f6;
+        border-bottom: 1px solid #f3f4f6;
+        padding: 16px;
+        vertical-align: middle;
+    }
+
+    .custom-table td:first-child {
+        border-left: 1px solid #f3f4f6;
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+
+    .custom-table td:last-child {
+        border-right: 1px solid #f3f4f6;
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    .dept-badge {
+        font-weight: 600;
+        padding: 0.35em 0.8em;
+        border-radius: 8px;
+        font-size: 0.8rem;
+    }
+
+    .dept-se { background-color: #e0e7ff; color: #4338ca; }
+    .dept-cs { background-color: #dcfce7; color: #15803d; }
+    .dept-it { background-color: #fef9c3; color: #a16207; }
+    .dept-ds { background-color: #fae8ff; color: #a21caf; }
+    .dept-other { background-color: #f3f4f6; color: #4b5563; }
+
+    .stat-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        background: white;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        border: 1px solid #f3f4f6;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #a78bfa;
+        box-shadow: 0 0 0 0.25rem rgba(167, 139, 250, 0.25);
+    }
+</style>
+
+<div class="container py-4">
+    <!-- Header Hero -->
+    <div class="gradient-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h1 class="fw-bold m-0"><i class="fa-solid fa-graduation-cap me-2"></i>Student2 Hub</h1>
+            <p class="m-0 mt-1 opacity-75">Advanced Async Student Management & Department Analytics</p>
+        </div>
+        <div>
+            <button class="btn btn-light fw-bold text-primary py-2 px-4 shadow-sm" id="btnAddNewStudent">
+                <i class="fa-solid fa-plus me-2"></i>Add Student
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="glass-card p-4 mb-4">
+        <h5 class="fw-bold mb-3 text-secondary"><i class="fa-solid fa-chart-simple me-2"></i>Department Analytics</h5>
+        <div id="statsContainer" class="d-flex flex-wrap">
+            <span class="text-muted">Loading department metrics...</span>
+        </div>
+    </div>
+
+    <!-- Main Content & Filter Area -->
+    <div class="glass-card p-4">
+        <div class="row g-3 mb-4 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="studentSearchInput" class="form-control border-start-0" placeholder="Search by name, email or department..." />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select id="departmentFilterSelect" class="form-select">
+                    <option value="">All Departments</option>
+                    <option value="SE">Software Engineering (SE)</option>
+                    <option value="CS">Computer Science (CS)</option>
+                    <option value="IT">Information Technology (IT)</option>
+                    <option value="DS">Data Science (DS)</option>
+                </select>
+            </div>
+            <div class="col-md-3 text-md-end">
+                <button class="btn btn-outline-secondary w-100" id="btnClearFilters">
+                    <i class="fa-solid fa-filter-circle-xmark me-2"></i>Clear Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Student Table -->
+        <div class="table-responsive">
+            <table class="table custom-table" id="student2Table">
+                <thead>
+                    <tr>
+                        <th width="10%">ID</th>
+                        <th width="30%">Name</th>
+                        <th width="30%">Email Address</th>
+                        <th width="15%">Department</th>
+                        <th width="15%" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="student2TableBody">
+                    <!-- Loaded dynamically via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Add/Edit -->
+<div class="modal fade" id="student2Modal" tabindex="-1" aria-labelledby="student2ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-primary" id="student2ModalLabel">Add New Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <form id="student2Form" novalidate>
+                    <input type="hidden" id="modalStudentId" />
+                    
+                    <div class="mb-3">
+                        <label for="modalStudentName" class="form-label fw-semibold">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-secondary"><i class="fa-regular fa-user"></i></span>
+                            <input type="text" class="form-control" id="modalStudentName" placeholder="e.g. John Doe" required />
+                        </div>
+                        <div class="invalid-feedback">Please enter the student's name.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modalStudentEmail" class="form-label fw-semibold">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-secondary"><i class="fa-regular fa-envelope"></i></span>
+                            <input type="email" class="form-control" id="modalStudentEmail" placeholder="e.g. john@example.com" required />
+                        </div>
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modalStudentDept" class="form-label fw-semibold">Department</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-secondary"><i class="fa-solid fa-building"></i></span>
+                            <select class="form-select" id="modalStudentDept" required>
+                                <option value="" disabled selected>Choose department...</option>
+                                <option value="SE">SE (Software Engineering)</option>
+                                <option value="CS">CS (Computer Science)</option>
+                                <option value="IT">IT (Information Technology)</option>
+                                <option value="DS">DS (Data Science)</option>
+                            </select>
+                        </div>
+                        <div class="invalid-feedback">Please select a department.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-gradient" id="btnSaveStudent2">Save Student</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Initial list of students loaded from Model
+        let allStudents = @Html.Raw(Json.Serialize(Model));
+        let bootstrapModal;
+
+        $(document).ready(function() {
+            bootstrapModal = new bootstrap.Modal(document.getElementById('student2Modal'));
+            
+            renderTable(allStudents);
+            updateStats();
+
+            // Open Create Modal
+            $('#btnAddNewStudent').click(function() {
+                clearForm();
+                $('#student2ModalLabel').text('Add New Student');
+                bootstrapModal.show();
+            });
+
+            // Save Action (Add or Update)
+            $('#btnSaveStudent2').click(function() {
+                const form = document.getElementById('student2Form');
+                if (!form.checkValidity()) {
+                    form.classList.add('was-validated');
+                    return;
+                }
+
+                const idVal = $('#modalStudentId').val();
+                const isEdit = idVal !== '';
+
+                const studentData = {
+                    Id: isEdit ? parseInt(idVal) : 0,
+                    Name: $('#modalStudentName').val().trim(),
+                    Email: $('#modalStudentEmail').val().trim(),
+                    Department: $('#modalStudentDept').val()
+                };
+
+                const url = isEdit ? '/Student2/UpdateStudent' : '/Student2/AddStudent';
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: studentData,
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Saved!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            
+                            bootstrapModal.hide();
+                            
+                            // Update local list
+                            if (isEdit) {
+                                const idx = allStudents.findIndex(s => s.id === studentData.Id);
+                                if (idx !== -1) {
+                                    allStudents[idx] = { ...allStudents[idx], ...studentData };
+                                }
+                            } else {
+                                // Add response student (which includes generated Id)
+                                allStudents.push(response.student);
+                            }
+
+                            applyFilters();
+                            updateStats();
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'An error occurred while saving the student.', 'error');
+                    }
+                });
+            });
+
+            // Delete Action
+            $(document).on('click', '.delete-student-btn', function() {
+                const id = $(this).data('id');
+                const name = $(this).data('name');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to delete ${name}?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Student2/DeleteStudent',
+                            type: 'POST',
+                            data: { id: id },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire('Deleted!', response.message, 'success');
+                                    allStudents = allStudents.filter(s => s.id !== id);
+                                    applyFilters();
+                                    updateStats();
+                                } else {
+                                    Swal.fire('Error', response.message, 'error');
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Error', 'An error occurred during deletion.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Edit Action (Prefill form)
+            $(document).on('click', '.edit-student-btn', function() {
+                const id = $(this).data('id');
+                const student = allStudents.find(s => s.id === id);
+
+                if (student) {
+                    clearForm();
+                    $('#student2ModalLabel').text('Edit Student Info');
+                    $('#modalStudentId').val(student.id);
+                    $('#modalStudentName').val(student.name);
+                    $('#modalStudentEmail').val(student.email);
+                    $('#modalStudentDept').val(student.department);
+                    bootstrapModal.show();
+                }
+            });
+
+            // Live search & filtering
+            $('#studentSearchInput').on('input', applyFilters);
+            $('#departmentFilterSelect').on('change', applyFilters);
+
+            // Clear filters
+            $('#btnClearFilters').click(function() {
+                $('#studentSearchInput').val('');
+                $('#departmentFilterSelect').val('');
+                renderTable(allStudents);
+            });
+        });
+
+        // Get Badge styling based on department
+        function getDeptClass(dept) {
+            if (!dept) return 'dept-other';
+            const d = dept.toUpperCase();
+            if (d === 'SE') return 'dept-se';
+            if (d === 'CS') return 'dept-cs';
+            if (d === 'IT') return 'dept-it';
+            if (d === 'DS') return 'dept-ds';
+            return 'dept-other';
+        }
+
+        // Render Table contents
+        function renderTable(students) {
+            const tbody = $('#student2TableBody');
+            tbody.empty();
+
+            if (students.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            <i class="fa-regular fa-folder-open fa-2x mb-2 d-block"></i>
+                            No students found.
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+
+            students.forEach(student => {
+                const badgeClass = getDeptClass(student.department);
+                tbody.append(`
+                    <tr id="row-${student.id}">
+                        <td><span class="fw-semibold text-secondary">#${student.id}</span></td>
+                        <td><span class="fw-bold text-dark">${escapeHtml(student.name)}</span></td>
+                        <td><span class="text-muted">${escapeHtml(student.email)}</span></td>
+                        <td><span class="dept-badge ${badgeClass}">${escapeHtml(student.department)}</span></td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary edit-student-btn me-1" data-id="${student.id}" title="Edit">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-student-btn" data-id="${student.id}" data-name="${escapeHtml(student.name)}" title="Delete">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        // Apply search query and department dropdown filters
+        function applyFilters() {
+            const searchQuery = $('#studentSearchInput').val().toLowerCase().trim();
+            const deptFilter = $('#departmentFilterSelect').val();
+
+            const filtered = allStudents.filter(student => {
+                const matchesSearch = !searchQuery || 
+                    student.name.toLowerCase().includes(searchQuery) ||
+                    student.email.toLowerCase().includes(searchQuery) ||
+                    (student.department && student.department.toLowerCase().includes(searchQuery));
+
+                const matchesDept = !deptFilter || student.department === deptFilter;
+
+                return matchesSearch && matchesDept;
+            });
+
+            renderTable(filtered);
+        }
+
+        // Update statistics cards/pills dynamically
+        function updateStats() {
+            $.ajax({
+                url: '/Student2/GetDepartmentStats',
+                type: 'GET',
+                success: function(stats) {
+                    const container = $('#statsContainer');
+                    container.empty();
+
+                    if (!stats || stats.length === 0) {
+                        container.html('<span class="text-muted">No statistics available.</span>');
+                        return;
+                    }
+
+                    stats.forEach(item => {
+                        const badgeClass = getDeptClass(item.department);
+                        container.append(`
+                            <div class="stat-pill">
+                                <span class="dept-badge ${badgeClass} me-2">${item.department}</span>
+                                <span class="fw-bold">${item.count}</span>
+                            </div>
+                        `);
+                    });
+                },
+                error: function() {
+                    $('#statsContainer').html('<span class="text-danger">Failed to load statistics.</span>');
+                }
+            });
+        }
+
+        // Reset and clear the form inside Modal
+        function clearForm() {
+            const form = document.getElementById('student2Form');
+            form.classList.remove('was-validated');
+            form.reset();
+            $('#modalStudentId').val('');
+        }
+
+        // Simple helper to prevent HTML injection/XSS
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+}
